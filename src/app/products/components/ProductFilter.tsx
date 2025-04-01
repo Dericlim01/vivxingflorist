@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface FilterProps {
@@ -25,31 +25,28 @@ export default function ProductFilter({
     const [priceRange, setPriceRange] = useState(initialPrice);
     const searchParams = useSearchParams();
 
-    // Sync with URL parameters
+    const handleCategoryChange = useCallback((value: string) => {
+        setSelectedCategory(value);
+        onCategoryChange(value);
+    }, [onCategoryChange]);
+
+    const handlePriceChange = useCallback((value: string) => {
+        setPriceRange(value);
+        onPriceRangeChange(value);
+    }, [onPriceRangeChange]);
+
     useEffect(() => {
         const category = searchParams.get('category') || 'all';
         const price = searchParams.get('price') || 'all';
         
         if (category !== selectedCategory) {
-            setSelectedCategory(category);
-            onCategoryChange(category);
+            handleCategoryChange(category);
         }
         
         if (price !== priceRange) {
-            setPriceRange(price);
-            onPriceRangeChange(price);
+            handlePriceChange(price);
         }
-    }, [searchParams]);
-
-    const handleCategoryChange = (value: string) => {
-        setSelectedCategory(value);
-        onCategoryChange(value);
-    };
-
-    const handlePriceChange = (value: string) => {
-        setPriceRange(value);
-        onPriceRangeChange(value);
-    };
+    }, [searchParams, selectedCategory, priceRange, handleCategoryChange, handlePriceChange]);
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md sticky top-32">
