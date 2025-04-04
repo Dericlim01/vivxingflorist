@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Category } from '@/app/types';
 import Header from '../../components/Header';
@@ -9,7 +9,7 @@ import ProductFilter from './components/ProductFilter';
 import ProductCard from '@/components/ProductCard';
 import WhatsAppFloat from '../whatsappFloat';
 
-export default function ProductsPage() {
+function ProductContent() {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState('all');
     const [isLoading, setIsLoading] = useState(false);
@@ -190,5 +190,18 @@ export default function ProductsPage() {
             <Footer />
             <WhatsAppFloat />
         </div>
+    );
+}
+
+// Main page component with Suspense boundary
+export default function ProductsPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-amber-500" />
+            </div>
+        }>
+            <ProductContent />
+        </Suspense>
     );
 }
