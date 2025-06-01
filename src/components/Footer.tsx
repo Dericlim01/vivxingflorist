@@ -15,9 +15,9 @@ export default function Footer() {
                     {/* Contact Info */}
                     <div className="text-center">
                         <h3 className="font-bold text-lg mb-3">Contact Us</h3>
-                        <p className="text-gray-300">Tel: +60 12-345-6789</p>
+                        <p className="text-gray-300">Tel: +60 11-5982-9711</p>
                         <p className="text-gray-300">Email: email@email.com</p>
-                        <p className="text-gray-300">WhatsApp: +60 12-345-6789</p>
+                        <p className="text-gray-300">WhatsApp: +60 11-5982-9711</p>
                     </div>
 
                     {/* Business Hours */}
@@ -60,7 +60,7 @@ export default function Footer() {
                         rel="noopener noreferrer">
                         小红书
                     </a>
-                    <a href="https://www.threads.net/@[your-username]" 
+                    <a href="https://www.threads.com/@jjjyue0902?igshid=NTc4MTIwNjQ2YQ==" 
                         className="text-gray-300 hover:text-white transition-colors"
                         target="_blank"
                         rel="noopener noreferrer">
