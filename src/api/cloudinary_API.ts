@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from '@/utils/cloudinary';
 
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  api_url: process.env.CLOUDINARY_API_URL,
-});
+interface CloudinaryImageResource {
+  public_id: string;
+  url: string;
+  width: number;
+  height: number;
+  [key: string]: unknown;
+}
 
-export async function get_image_data(category) {
+export async function get_image_data(category: string) {
   try {
     // Fetch images from Cloudinary
     const result = await cloudinary.api.resources({
@@ -17,7 +17,7 @@ export async function get_image_data(category) {
       max_results: 30,
     });
     // Map the result to get the image URLs and other data
-    const images = result.resources.map((image) => {
+    const images = result.resources.map((image: CloudinaryImageResource) => {
       return {
         public_id: image.public_id,
         url: image.secure_url,
@@ -25,7 +25,6 @@ export async function get_image_data(category) {
         height: image.height,
       };
     });
-    console.log('Fetched images:', images);
     return images;
   } catch (error) {
     console.error('Error fetching images:', error);
@@ -40,7 +39,7 @@ export async function get_logo_data() {
       prefix: 'vivxingflorist/logo',
       max_results: 1,
     });
-    const images = result.resources.map((image) => {
+    const images = result.resources.map((image: CloudinaryImageResource) => {
       return {
         public_id: image.public_id,
         url: image.secure_url,
@@ -48,7 +47,6 @@ export async function get_logo_data() {
         height: image.height,
       };
     });
-    console.log('Fetched logo:', images);
     return images;
   } catch (error) {
     console.error('Error fetching logo:', error);
@@ -56,19 +54,15 @@ export async function get_logo_data() {
   }
 }
 
-// Get images from Cloudinary
-export async function GET(request) {
+export async function getImageByCategory(category: string): Promise<string | undefined> {
   try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category') || '';
-
-    const images = await get_image_src(category);
-    return NextResponse.json(images);
+    const images = category === 'logo' ? await get_logo_data() : await get_image_data(category);
+    if (images && images.length > 0) {
+      return images[0].url;
+    }
+    return undefined;
   } catch (error) {
-    console.error('Error fetching images:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch images' },
-      { status: 500 }
-    );
+    console.error('Error in getImage:', error);
+    return undefined;
   }
 }

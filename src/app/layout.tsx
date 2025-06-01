@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { getImageByCategory } from "@/utils/cloudinary";
+import { getImageByCategory } from "@/api/cloudinary_API";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

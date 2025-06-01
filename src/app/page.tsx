@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FaSpa, FaLeaf, FaPencilRuler } from 'react-icons/fa';
 import Link from 'next/link';
 import WhatsAppFloat from '../components/whatsappFloat';
-import { getImageByCategory } from '@/utils/cloudinary';
+import { getImageByCategory } from '@/api/cloudinary_API';
 
 const customizeImages = await getImageByCategory('customize');
 const soapImages = await getImageByCategory('soap');
@@ -97,7 +97,6 @@ export default function Home() {
               <div className="p-4 bg-white">
                 <h3 className="font-semibold text-lg mb-2 text-gray-800">Custom Bouquet</h3>
                 <p className="text-gray-600 mb-2">Personalized mask arrangement</p>
-                <p className="text-amber-600 font-bold">RM 129.00</p>
               </div>
             </div>
 
@@ -114,7 +113,6 @@ export default function Home() {
               <div className="p-4 bg-white">
                 <h3 className="font-semibold text-lg mb-2 text-gray-800">Soap Flower Bouquet</h3>
                 <p className="text-gray-600 mb-2">Long-lasting soap flower arrangement</p>
-                <p className="text-amber-600 font-bold">RM 149.00</p>
               </div>
             </div>
 
@@ -131,7 +129,6 @@ export default function Home() {
               <div className="p-4 bg-white">
                 <h3 className="font-semibold text-lg mb-2 text-gray-800">Preserved Roses</h3>
                 <p className="text-gray-600 mb-2">Everlasting preserved roses</p>
-                <p className="text-amber-600 font-bold">RM 169.00</p>
               </div>
             </div>
 
@@ -148,7 +145,6 @@ export default function Home() {
               <div className="p-4 bg-white">
                 <h3 className="font-semibold text-lg mb-2 text-gray-800">Dried Flowers</h3>
                 <p className="text-gray-600 mb-2">Natural dried flower bouquet</p>
-                <p className="text-amber-600 font-bold">RM 199.00</p>
               </div>
             </div>
           </div>
@@ -220,7 +216,7 @@ export default function Home() {
                     <h3 className="text-2xl font-bold text-white mb-2">Custom Designs</h3>
                     <p className="text-white/90 mb-4">Personalized arrangements for any occasion</p>
                     <Link 
-                      href={`/products?category=custom`} 
+                      href={`/products?category=customize`} 
                       className="bg-white/90 text-gray-800 px-6 py-2 rounded-full 
                         hover:bg-white transition-colors text-sm font-semibold">
                       View Collection

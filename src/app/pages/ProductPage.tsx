@@ -2,58 +2,87 @@
 
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Category } from '@/app/types';
+// import { Category } from '@/app/types';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import ProductFilter from './components/ProductFilter';
+import ProductFilter from '../../components/ProductFilter';
 import ProductCard from '@/components/ProductCard';
 import WhatsAppFloat from '../../components/whatsappFloat';
-import { getImageByCategory } from '@/utils/cloudinary';
 
-const customizeImages = await getImageByCategory('customize');
-const soapImages = await getImageByCategory('soap');
-const preservedImages = await getImageByCategory('preserved');
-const driedImages = await getImageByCategory('dried');
+interface ProductImage {
+  url: string;
+  [key: string]: unknown;
+}
 
 function ProductContent() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [images, setImages] = useState<{ [key: string]: ProductImage[] }>({});
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Memoized categories
-  const categories = useMemo<Category[]>(() => [
-    {
-      id: 'soap',
-      name: 'Soap Flowers',
-      description: 'Long-lasting handcrafted soap flowers',
-      image: getImageByCategory('soap'),
-      price: 149.00
-    },
-    {
-      id: 'preserved',
-      name: 'Preserved Flowers',
-      description: 'Everlasting natural preserved flowers',
-      image: '/images/products/preserved/category.jpg',
-      price: 199.00
-    },
-    {
-      id: 'custom',
-      name: 'Custom Designs',
-      description: 'Personalized arrangements for special occasions',
-      image: '/images/products/custom/category.jpg',
-      price: 299.00
-    },
-    {
-      id: 'dried',
-      name: 'Dried Flowers',
-      description: 'Natural dried flower arrangements',
-      image: '/images/products/dried/category.jpg',
-      price: 129.00
+  useEffect(() => {
+    async function fetchImages() {
+      setIsLoading(true);
+      try {
+        const categories = ['soap', 'preserved', 'customize', 'dried'];
+        const results = await Promise.all(
+          categories.map(async (cat) => {
+            const res = await fetch(`/api/cloudinary?category=${cat}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            return Array.isArray(data) ? data.filter((img: ProductImage) => img.url) : [];
+          })
+        );
+        setImages({
+          soap: results[0] || [],
+          preserved: results[1] || [],
+          customize: results[2] || [],
+          dried: results[3] || [],
+        });
+      } catch (e) {
+        console.error(e);
+        setError('Failed to load images.');
+      } finally {
+        setIsLoading(false);
+      }
     }
-  ], []);
+    fetchImages();
+  }, []);
+
+  // // Memoized categories
+  // const categories = useMemo<Category[]>(() => [
+  //   {
+  //     id: 'soap',
+  //     name: 'Soap Flowers',
+  //     description: 'Long-lasting handcrafted soap flowers',
+  //     image: images.soap && images.soap.length > 0 ? images.soap[0].url : '',
+  //     price: 149.00
+  //   },
+  //   {
+  //     id: 'preserved',
+  //     name: 'Preserved Flowers',
+  //     description: 'Everlasting natural preserved flowers',
+  //     image: images.preserved && images.preserved.length > 0 ? images.preserved[0].url : '',
+  //     price: 199.00
+  //   },
+  //   {
+  //     id: 'customize',
+  //     name: 'Custom Designs',
+  //     description: 'Personalized arrangements for special occasions',
+  //     image: images.customize && images.customize.length > 0 ? images.customize[0].url : '',
+  //     price: 299.00
+  //   },
+  //   {
+  //     id: 'dried',
+  //     name: 'Dried Flowers',
+  //     description: 'Natural dried flower arrangements',
+  //     image: images.dried && images.dried.length > 0 ? images.dried[0].url : '',
+  //     price: 129.00
+  //   }
+  // ], [images]);
 
   // Memoized filters configuration
   const filters = useMemo(() => ({
@@ -61,7 +90,7 @@ function ProductContent() {
       { id: 'all', name: 'All Products' },
       { id: 'soap', name: 'Soap Flowers' },
       { id: 'preserved', name: 'Preserved Flowers' },
-      { id: 'custom', name: 'Custom Designs' },
+      { id: 'customize', name: 'Custom Designs' },
       { id: 'dried', name: 'Dried Flowers' }
     ],
     priceRanges: [
@@ -72,28 +101,28 @@ function ProductContent() {
     ]
   }), []);
 
-  // Memoized price filter function
-  const filterByPrice = useMemo(() => (price: number) => {
-    switch (priceRange) {
-      case 'under100':
-        return price < 100;
-      case '100-200':
-        return price >= 100 && price <= 200;
-      case 'above200':
-        return price > 200;
-      default:
-        return true;
-    }
-  }, [priceRange]);
+  // // Memoized price filter function
+  // const filterByPrice = useMemo(() => (price: number) => {
+  //   switch (priceRange) {
+  //     case 'under100':
+  //       return price < 100;
+  //     case '100-200':
+  //       return price >= 100 && price <= 200;
+  //     case 'above200':
+  //       return price > 200;
+  //     default:
+  //       return true;
+  //   }
+  // }, [priceRange]);
 
-  // Memoized filtered categories
-  const filteredCategories = useMemo(() => 
-    categories.filter(category => {
-      if (selectedCategory === 'all') return true;
-      return category.id === selectedCategory;
-    }).filter(category => filterByPrice(category.price)),
-    [categories, selectedCategory, filterByPrice]
-  );
+  // // Memoized filtered categories
+  // const filteredCategories = useMemo(() => 
+  //   categories.filter(category => {
+  //     if (selectedCategory === 'all') return true;
+  //     return category.id === selectedCategory;
+  //   }).filter(category => filterByPrice(category.price)),
+  //   [categories, selectedCategory, filterByPrice]
+  // );
 
   // URL parameter sync
   useEffect(() => {
@@ -106,7 +135,6 @@ function ProductContent() {
   // Filter handlers
   const handleCategoryChange = async (category: string) => {
     setIsLoading(true);
-    setSelectedCategory(category);
     const params = new URLSearchParams(searchParams.toString());
     params.set('category', category);
     await router.push(`/products?${params.toString()}`);
@@ -159,17 +187,30 @@ function ProductContent() {
                     <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-amber-500" />
                   </div>
                 ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {filteredCategories.map((category) => (
-                    <ProductCard
-                      key={category.id}
-                      title={category.name}
-                      description={category.description}
-                      price={category.price}
-                      imageUrl={category.image}
-                      onClick={() => handleCategoryChange(category.id)}
-                    />
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {selectedCategory === 'all'
+                  ? ['soap', 'preserved', 'customize', 'dried'].flatMap(cat =>
+                      (images[cat] || []).map((img, idx) => (
+                        <ProductCard
+                          key={`${cat}-${idx}`}
+                          title={cat.charAt(0).toUpperCase() + cat.slice(1)}
+                          description=""
+                          // price={0}
+                          imageUrl={img.url}
+                          onClick={() => {}}
+                        />
+                      ))
+                    )
+                  : (images[selectedCategory] || []).map((img, idx) => (
+                      <ProductCard
+                        key={idx}
+                        title={selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
+                        description=""
+                        // price={0}
+                        imageUrl={img.url}
+                        onClick={() => {}}
+                      />
+                    ))}
                 </div>
                 )}
               </div>

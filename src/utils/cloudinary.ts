@@ -1,32 +1,10 @@
-import { get_image_data, get_logo_data } from '../app/api/cloudinary_API';
+import { v2 as cloudinary } from 'cloudinary';
 
-export async function getImageByCategoryAndType(
-  category: string,
-  type: string
-): Promise<string | undefined> {
-  try {
-    const images = await get_image_data(category);
-    if (images && images.length > 0) {
-      console.log('url', images[0].url);
-      return images[0].url;
-    }
-    return undefined;
-  } catch (error) {
-    console.error('Error in getImage:', error);
-    return undefined;
-  }
-}
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_url: process.env.CLOUDINARY_API_URL,
+});
 
-export async function getImageByCategory(category: string): Promise<string | undefined> {
-  try {
-    const images = category === 'logo' ? await get_logo_data() : await get_image_data(category);
-    if (images && images.length > 0) {
-      console.log('url', images[0].url);
-      return images[0].url;
-    }
-    return undefined;
-  } catch (error) {
-    console.error('Error in getImage:', error);
-    return undefined;
-  }
-}
+export default cloudinary;
